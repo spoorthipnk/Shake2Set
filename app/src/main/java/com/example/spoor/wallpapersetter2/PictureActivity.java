@@ -1,6 +1,8 @@
 package com.example.spoor.wallpapersetter2;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +14,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.net.Uri;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -41,6 +44,7 @@ public class PictureActivity extends AppCompatActivity implements SensorEventLis
     ArrayList<Bitmap> imageList;
     Cursor cursor;
     Button btn_gallery;
+    private Context context;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,6 +95,14 @@ public class PictureActivity extends AppCompatActivity implements SensorEventLis
         GridView gridView = (GridView)findViewById(R.id.gridview_photos);
         gridView.setNumColumns(3);
         gridView.setAdapter(new GridViewAdapter(getApplicationContext(),imageList));
+        this.context = this;
+        Intent alarm = new Intent(this.context, AlarmReceiver.class);
+        boolean alarmRunning = (PendingIntent.getBroadcast(this.context, 0, alarm, PendingIntent.FLAG_NO_CREATE) != null);
+        if(alarmRunning == false) {
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this.context, 0, alarm, 0);
+            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), 1800000, pendingIntent);
+        }
 
     }
 
